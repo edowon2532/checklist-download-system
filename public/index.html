@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점검표 관리 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f6fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            text-align: center;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .checklist-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .checklist-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .checklist-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .checklist-info {
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .checklist-info div {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .checklist-info strong {
+            min-width: 80px;
+            color: #333;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #21618c);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #229954, #1e8449);
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #138496, #117a8b);
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 3% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .item-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            transition: all 0.3s ease;
+        }
+
+        .item-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1);
+        }
+
+        .item-question {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+
+        .item-answer {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .item-note {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            background: #fff3e0;
+            border-radius: 6px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .item-image {
+            max-width: 250px;
+            max-height: 200px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .item-image:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error, .success {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f1b0b7;
+        }
+
+        .success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #b8dacc;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+
+            .checklist-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+        }
+
+        /* 스타일 개선 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 점검표 관리 시스템</h1>
+            <p>안전점검 결과를 확인하고 PDF/Excel 파일로 다운로드하세요</p>
+            <div id="serverStatus" class="status-badge status-online">서버 연결됨</div>
+        </header>
+
+        <div id="loadingMessage" class="loading">
+            점검표 목록을 불러오는 중
+        </div>
+
+        <div id="errorMessage" class="error" style="display: none;"></div>
+
+        <div id="checklistGrid" class="checklist-grid" style="display: none;">
+            <!-- 점검표 카드들이 여기에 동적으로 추가됩니다 -->
+        </div>
+    </div>
+
+    <!-- 점검표 상세보기 모달 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalContent">
+                <!-- 상세 내용이 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 이미지 확대보기 모달 -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close">&times;</span>
+            <img id="modalImage" style="max-width: 100%; max-height: 70vh; border-radius: 8px;" />
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+
+        // 페이지 로드 시 점검표 목록 가져오기
+        document.addEventListener('DOMContentLoaded', function() {
+            loadChecklists();
+            setupModalHandlers();
+            checkServerStatus();
+        });
+
+        // 서버 상태 확인
+        async function checkServerStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/checklists`);
+                if (response.ok) {
+                    document.getElementById('serverStatus').textContent = '서버 연결됨';
+                    document.getElementById('serverStatus').className = 'status-badge status-online';
+                }
+            } catch (error) {
+                document.getElementById('serverStatus').textContent = '서버 연결 실패';
+                document.getElementById('serverStatus').className = 'status-badge status-offline';
+            }
+        }
+
+        // 점검표 목록 로드
+        async function loadChecklists() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/checklists`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const checklists = await response.json();
+                
+                displayChecklists(checklists);
+                
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('checklistGrid').style.display = 'grid';
+                
+            } catch (error) {
+                console.error('점검표 목록 로드 실패:', error);
+                showError(`점검표 목록을 불러올 수 없습니다: ${error.message}`);
+            }
+        }
+
+        // 점검표 목록 표시
+        function displayChecklists(checklists) {
+            const grid = document.getElementById('checklistGrid');
+            grid.innerHTML = '';
+
+            if (checklists.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: white; font-size: 1.2em;">등록된 점검표가 없습니다.</div>';
+                return;
+            }
+
+            checklists.forEach(checklist => {
+                const card = document.createElement('div');
+                card.className = 'checklist-card';
+                card.innerHTML = `
+                    <div class="checklist-title">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px;"><rect x="2" y="3" width="16" height="15" rx="2" fill="#fff" stroke="#222" stroke-width="1.5"/><rect x="5" y="1" width="10" height="4" rx="2" fill="#fff" stroke="#222" stroke-width="1.5"/></svg>
+                        ${checklist.title}
+                    </div>
+                    <div class="checklist-info">
+                        <div><strong>점검팀:</strong> ${checklist.team || '-'}</div>
+                        <div><strong>점검주기:</strong> ${checklist.cycle || '-'}</div>
+                        <div><strong>장소:</strong> ${checklist.locations.length}개소</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-info" onclick="viewDetails(${checklist.id})">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 18 18" style="vertical-align:middle;margin-right:4px;"><circle cx="9" cy="9" r="8" stroke="#222" stroke-width="1.5" fill="#fff"/><circle cx="9" cy="9" r="3" fill="#222"/></svg> 상세보기
+                        </button>
+                        <button class="btn btn-success" onclick="downloadFile(${checklist.id}, 'pdf')">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 18 18" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="2" width="12" height="14" rx="2" stroke="#222" stroke-width="1.5" fill="#fff"/><rect x="6" y="6" width="6" height="1.5" rx="0.75" fill="#222"/></svg> PDF
+                        </button>
+                        <button class="btn btn-primary" onclick="downloadFile(${checklist.id}, 'excel')">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 18 18" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="2" width="12" height="14" rx="2" stroke="#222" stroke-width="1.5" fill="#fff"/><rect x="6" y="6" width="6" height="1.5" rx="0.75" fill="#222"/><rect x="6" y="9" width="6" height="1.5" rx="0.75" fill="#222"/></svg> Excel
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 점검표 상세보기
+        async function viewDetails(checklistId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/checklist/${checklistId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const checklist = await response.json();
+                
+                displayChecklistDetails(checklist);
+                document.getElementById('detailModal').style.display = 'block';
+                
+            } catch (error) {
+                console.error('점검표 상세정보 로드 실패:', error);
+                showError(`점검표 상세정보를 불러올 수 없습니다: ${error.message}`);
+            }
+        }
+
+        // 점검표 상세정보 표시
+        function displayChecklistDetails(checklist) {
+            const modalContent = document.getElementById('modalContent');
+            // 장소 드롭다운 생성
+            let locationOptions = checklist.locations.map((loc, idx) => `<option value="${idx}">${loc.name}</option>`).join('');
+            let html = `
+                <h2 style="display:flex;align-items:center;gap:8px;">
+                    <svg width="22" height="22" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;"><rect x="2" y="3" width="16" height="15" rx="2" fill="#fff" stroke="#222" stroke-width="1.5"/><rect x="5" y="1" width="10" height="4" rx="2" fill="#fff" stroke="#222" stroke-width="1.5"/></svg>
+                    ${checklist.title}
+                </h2>
+                <div style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <p><strong>점검장소:</strong> <select id="locationSelect" style="font-size:1em;padding:2px 8px;border-radius:6px;border:1px solid #ccc;">${locationOptions}</select></p>
+                    <p id="locationDateInspector"></p>
+                </div>
+                <div class="btn-group" style="margin-bottom: 25px;">
+                    <button class="btn btn-success" id="pdfDownloadBtn">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 18 18" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="2" width="12" height="14" rx="2" stroke="#222" stroke-width="1.5" fill="#fff"/><rect x="6" y="6" width="6" height="1.5" rx="0.75" fill="#222"/></svg> PDF 다운로드
+                    </button>
+                    <button class="btn btn-primary" id="excelDownloadBtn">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 18 18" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="2" width="12" height="14" rx="2" stroke="#222" stroke-width="1.5" fill="#fff"/><rect x="6" y="6" width="6" height="1.5" rx="0.75" fill="#222"/><rect x="6" y="9" width="6" height="1.5" rx="0.75" fill="#222"/></svg> Excel 다운로드
+                    </button>
+                </div>
+                <hr style="margin: 25px 0; border: 2px solid #e9ecef;">
+                <div id="locationItemsArea"></div>
+            `;
+            modalContent.innerHTML = html;
+            // 최초 표시(첫 번째 장소)
+            renderLocationItems(checklist, 0);
+            // 드롭다운 이벤트 및 다운로드 버튼 이벤트
+            let currentLocIdx = 0;
+            document.getElementById('locationSelect').addEventListener('change', function() {
+                currentLocIdx = parseInt(this.value);
+                renderLocationItems(checklist, currentLocIdx);
+            });
+            document.getElementById('pdfDownloadBtn').onclick = function() {
+                downloadFile(checklist.id, 'pdf', currentLocIdx);
+            };
+            document.getElementById('excelDownloadBtn').onclick = function() {
+                downloadFile(checklist.id, 'excel', currentLocIdx);
+            };
+        }
+        // 장소별 점검 항목 렌더링 함수
+        function renderLocationItems(checklist, locIdx) {
+            const area = document.getElementById('locationItemsArea');
+            const location = checklist.locations[locIdx];
+            let html = `<h3 style="margin-bottom: 20px; color: #2c3e50;display:flex;align-items:center;gap:6px;">
+                <svg width="18" height="18" fill="none" viewBox="0 0 18 18" style="vertical-align:middle;"><rect x="2" y="3" width="14" height="12" rx="2" fill="#fff" stroke="#222" stroke-width="1.2"/><rect x="5" y="1" width="8" height="4" rx="2" fill="#fff" stroke="#222" stroke-width="1.2"/></svg>
+                ${location.name} 점검 항목들
+            </h3>`;
+            document.getElementById('locationDateInspector').innerHTML = `<strong>점검일:</strong> ${location.date || '-'} <strong>점검자:</strong> ${location.inspector || '-'}`;
+            location.items.forEach((item, index) => {
+                html += `
+                    <div class="item-card">
+                        <div class="item-question">${index + 1}. ${item.question}</div>
+                        <div class="item-answer"><strong>${item.answer === '예' ? '<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\' style=\'vertical-align:middle;margin-right:2px;\'><circle cx=\'8\' cy=\'8\' r=\'7\' stroke=\'#222\' stroke-width=\'1.5\' fill=\'#fff\'/><path d=\'M5 8l2 2 4-4\' stroke=\'#222\' stroke-width=\'1.5\' fill=\'none\'/></svg>' : item.answer === '아니오' ? '<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\' style=\'vertical-align:middle;margin-right:2px;\'><circle cx=\'8\' cy=\'8\' r=\'7\' stroke=\'#222\' stroke-width=\'1.5\' fill=\'#fff\'/><path d=\'M5 5l6 6M11 5l-6 6\' stroke=\'#222\' stroke-width=\'1.5\' fill=\'none\'/></svg>' : '<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\' style=\'vertical-align:middle;margin-right:2px;\'><circle cx=\'8\' cy=\'8\' r=\'7\' stroke=\'#222\' stroke-width=\'1.5\' fill=\'#fff\'/><circle cx=\'8\' cy=\'8\' r=\'2\' fill=\'#222\'/></svg>'} 답변:</strong> ${item.answer}</div>
+                        ${item.note ? `<div class="item-note"><svg width='14' height='14' viewBox='0 0 14 14' fill='none' style='vertical-align:middle;margin-right:2px;'><rect x='2' y='2' width='10' height='10' rx='2' fill='#fff' stroke='#222' stroke-width='1.2'/><path d='M4 7h6' stroke='#222' stroke-width='1.2' stroke-linecap='round'/></svg> 비고: ${item.note}</div>` : ''}
+                        ${item.image ? `
+                            <div style="margin-top: 15px;">
+                                <p><strong><svg width='16' height='16' viewBox='0 0 16 16' fill='none' style='vertical-align:middle;margin-right:2px;'><rect x='2' y='2' width='12' height='12' rx='2' fill='#fff' stroke='#222' stroke-width='1.2'/><circle cx='8' cy='8' r='3' fill='#222'/></svg> 첨부 사진:</strong></p>
+                                <img src="/${item.image}" 
+                                     class="item-image" 
+                                     onclick="showImageModal(this.src)"
+                                     alt="점검 사진" 
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuydtOuvuOyngCDroZzrk5wg7Iuk7YyoPC90ZXh0Pjwvc3ZnPg=='; this.alt='이미지 로드 실패';" />
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            area.innerHTML = html;
+        }
+
+        // 파일 다운로드
+        async function downloadFile(checklistId, format, locationIdx = null) {
+            try {
+                showSuccess(`${format.toUpperCase()} 파일을 생성하고 있습니다... ⏳`);
+                let url = `${API_BASE_URL}/checklist/${checklistId}/download/${format}`;
+                if (locationIdx !== null) {
+                    url += `?location=${locationIdx}`;
+                }
+                // fetch로 다운로드 확인
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`다운로드 실패: ${response.status} ${response.statusText}`);
+                }
+                // 실제 다운로드 실행
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `checklist_${checklistId}${locationIdx !== null ? `_loc${locationIdx+1}` : ''}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => {
+                    showSuccess(`${format.toUpperCase()} 파일 다운로드가 완료되었습니다! 🎉`);
+                }, 1500);
+            } catch (error) {
+                console.error('파일 다운로드 실패:', error);
+                showError(`파일 다운로드에 실패했습니다: ${error.message}`);
+            }
+        }
+
+        // 이미지 확대보기
+        function showImageModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').style.display = 'block';
+        }
+
+        // 모달 이벤트 핸들러 설정
+        function setupModalHandlers() {
+            const modals = document.querySelectorAll('.modal');
+            const closeButtons = document.querySelectorAll('.close');
+
+            closeButtons.forEach(button => {
+                button.onclick = function() {
+                    this.closest('.modal').style.display = 'none';
+                };
+            });
+
+            modals.forEach(modal => {
+                modal.onclick = function(event) {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                };
+            });
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    modals.forEach(modal => {
+                        modal.style.display = 'none';
+                    });
+                }
+            });
+        }
+
+        // 에러 메시지 표시
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = `❌ ${message}`;
+            errorDiv.style.display = 'block';
+            
+            document.getElementById('loadingMessage').style.display = 'none';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 8000);
+        }
+
+        // 성공 메시지 표시
+        function showSuccess(message) {
+            const existingSuccess = document.querySelector('.success');
+            if (existingSuccess) {
+                existingSuccess.remove();
+            }
+
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.innerHTML = `✅ ${message}`;
+            
+            document.querySelector('.container').insertBefore(
+                successDiv, 
+                document.getElementById('checklistGrid')
+            );
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 4000);
+        }
+    </script>
+</body>
+</html> 

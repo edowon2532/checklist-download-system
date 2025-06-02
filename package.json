@@ -1,0 +1,35 @@
+{
+  "name": "checklist-download-system",
+  "version": "1.0.0",
+  "description": "점검표 다운로드 시스템 - PDF 및 Excel 파일 생성",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "setup": "node setup.js",
+    "install-and-setup": "npm install && node setup.js",
+    "quick-start": "npm install && node setup.js && npm start"
+  },
+  "keywords": [
+    "checklist",
+    "pdf",
+    "excel",
+    "download"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "pdfkit": "^0.13.0",
+    "sharp": "^0.34.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

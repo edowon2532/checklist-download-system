@@ -1,0 +1,38 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:0.8" />
+            <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:0.6" />
+        </linearGradient>
+    </defs>
+    
+    <rect width="100%" height="100%" fill="url(#bgGrad)"/>
+    <rect x="20" y="20" width="360" height="260" fill="white" stroke="#4ecdc4" stroke-width="3" rx="15"/>
+    
+    <!-- 장비 아이콘 -->
+    <g transform="translate(180, 70)">
+        <rect x="0" y="10" width="40" height="35" fill="#4ecdc4" rx="8"/>
+        <circle cx="20" cy="27" r="10" fill="white"/>
+        <circle cx="20" cy="27" r="6" fill="#4ecdc4"/>
+        <rect x="15" y="3" width="10" height="10" fill="#4ecdc4" rx="3"/>
+    </g>
+    
+    <!-- 제목 -->
+    <text x="200" y="150" font-family="Arial, sans-serif" font-size="20" font-weight="bold" 
+          text-anchor="middle" fill="#4ecdc4">화재 경보기</text>
+    <text x="200" y="175" font-family="Arial, sans-serif" font-size="14" 
+          text-anchor="middle" fill="#666">테스트 완료</text>
+    <text x="200" y="195" font-family="Arial, sans-serif" font-size="12" 
+          text-anchor="middle" fill="#999">점검 결과 이미지</text>
+    
+    <!-- 상태 표시 -->
+    <g transform="translate(320, 40)">
+        <circle cx="15" cy="15" r="12" fill="#2ed573"/>
+             <path d="M7 15 L13 21 L23 9" stroke="white" stroke-width="2" fill="none"/>
+    </g>
+    
+    <!-- 장식 요소 -->
+    <circle cx="50" cy="50" r="3" fill="#4ecdc4" opacity="0.5"/>
+    <circle cx="350" cy="250" r="4" fill="#4ecdc4" opacity="0.3"/>
+    <circle cx="70" cy="230" r="2" fill="#4ecdc4" opacity="0.7"/>
+</svg>
